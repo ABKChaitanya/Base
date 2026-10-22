@@ -1,0 +1,13 @@
+{
+  "name": "hello-claude",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal Hello World web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
