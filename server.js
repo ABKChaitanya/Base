@@ -5,29 +5,29 @@ const path = require("node:path");
 const root = __dirname;
 const port = process.env.PORT || 3000;
 
+// Only these files are public, so server.js, package.json and .git/ are never served.
 const types = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "application/javascript; charset=utf-8",
+  "/index.html": "text/html; charset=utf-8",
+  "/style.css": "text/css; charset=utf-8",
+  "/app.js": "application/javascript; charset=utf-8",
 };
 
 http
   .createServer((req, res) => {
-    const urlPath = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
-    const file = path.join(root, urlPath === "/" ? "index.html" : urlPath);
+    const urlPath = new URL(req.url, "http://localhost").pathname;
+    const route = urlPath === "/" ? "/index.html" : urlPath;
 
-    // Refuse anything that resolves outside the project folder.
-    if (!file.startsWith(root + path.sep)) {
-      res.writeHead(403).end("Forbidden");
+    if (!types[route]) {
+      res.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
       return;
     }
 
-    fs.readFile(file, (err, data) => {
+    fs.readFile(path.join(root, route), (err, data) => {
       if (err) {
         res.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
         return;
       }
-      res.writeHead(200, { "Content-Type": types[path.extname(file)] || "application/octet-stream" });
+      res.writeHead(200, { "Content-Type": types[route] });
       res.end(data);
     });
   })
